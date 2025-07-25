@@ -17,7 +17,7 @@ struct ReportsView: View {
     @State private var selectedTimeFrame: TimeFrame = .week
     @State private var selectedChart: ChartType = .sales
     @State private var role: String = UserDefaults.standard.string(forKey: "role") ?? ""
-    @State private var showShareSheet = false
+    @State private var showExporter = false
     @State private var csvURL: URL? = nil
     
     enum TimeFrame: String, CaseIterable {
@@ -114,9 +114,16 @@ struct ReportsView: View {
                                 }
                                 .frame(height: 200)
                                 .chartXAxis {
-                                    AxisMarks(values: .stride(by: .day)) { value in
+                                    AxisMarks(values: .stride(by: .day, count: 7)) { value in
                                         AxisGridLine()
-                                        AxisValueLabel(format: .dateTime.weekday())
+                                        AxisValueLabel() {
+                                            if let date = value.as(Date.self) {
+                                                Text(date, format: .dateTime.month().day())
+                                                    .font(.caption2)
+                                                    .rotationEffect(.degrees(-45))
+                                                    .lineLimit(1)
+                                            }
+                                        }
                                     }
                                 }
                                 .chartYAxis {
@@ -207,9 +214,14 @@ struct ReportsView: View {
                         }
                     }
                 }
-                .sheet(isPresented: $showShareSheet, onDismiss: { csvURL = nil }) {
-                    if let csvURL = csvURL {
-                        ShareSheet(activityItems: [csvURL])
+                .fileExporter(
+                    isPresented: $showExporter,
+                    document: csvURL.map { CSVDocument(url: $0) },
+                    contentType: .commaSeparatedText,
+                    defaultFilename: selectedChart == .sales ? "SalesDetails.csv" : "InventoryDetails.csv"
+                ) { result in
+                    if case .success(_) = result {
+                        // 可选：导出成功提示
                     }
                 }
                 .onAppear { role = UserDefaults.standard.string(forKey: "role") ?? "" }
@@ -227,33 +239,41 @@ struct ReportsView: View {
     }
     
     private func exportCSV() {
-        let csvString = generateCSV()
+        let csvString: String
+        if selectedChart == .sales {
+            csvString = generateSalesDetailsCSV()
+        } else {
+            csvString = generateInventoryDetailsCSV()
+        }
         let tempDir = FileManager.default.temporaryDirectory
-        let fileURL = tempDir.appendingPathComponent("Report_Export.csv")
+        let fileURL = tempDir.appendingPathComponent(selectedChart == .sales ? "SalesDetails.csv" : "InventoryDetails.csv")
         do {
             try csvString.write(to: fileURL, atomically: true, encoding: .utf8)
             csvURL = fileURL
-            showShareSheet = true
+            showExporter = true
         } catch {
             // 可选：错误处理
         }
     }
     
-    private func generateCSV() -> String {
-        if selectedChart == .sales {
-            var csv = "Date,Amount\n"
-            for entry in dailySales {
-                let dateStr = DateFormatter.localizedString(from: entry.date, dateStyle: .short, timeStyle: .none)
-                csv += "\(dateStr),\(String(format: "%.2f", entry.amount))\n"
-            }
-            return csv
-        } else {
-            var csv = "Product,Quantity\n"
-            for product in products {
-                csv += "\(product.name ?? ""),\(product.quantity)\n"
-            }
-            return csv
+    private func generateSalesDetailsCSV() -> String {
+        var csv = "Date,Product,Quantity,Total Price\n"
+        for sale in filteredSales {
+            let dateStr = DateFormatter.localizedString(from: sale.date ?? Date(), dateStyle: .short, timeStyle: .none)
+            let product = sale.product?.name ?? ""
+            let quantity = sale.quantity
+            let total = String(format: "%.2f", sale.totalPrice)
+            csv += "\(dateStr),\(product),\(quantity),\(total)\n"
         }
+        return csv
+    }
+    
+    private func generateInventoryDetailsCSV() -> String {
+        var csv = "Product,Quantity,Purchase Price,Selling Price,Low Stock Threshold\n"
+        for product in products {
+            csv += "\(product.name ?? ""),\(product.quantity),\(product.purchasePrice),\(product.sellingPrice),\(product.lowStockThreshold)\n"
+        }
+        return csv
     }
 }
 

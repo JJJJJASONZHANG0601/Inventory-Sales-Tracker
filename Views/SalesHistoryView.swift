@@ -60,7 +60,6 @@ struct SalesHistoryView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    
                     HStack {
                         Text("Total Sales")
                             .font(.headline)
@@ -70,27 +69,27 @@ struct SalesHistoryView: View {
                             .foregroundColor(.blue)
                     }
                 }
-                
-                ForEach(filteredSales) { sale in
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(sale.product?.name ?? "Unknown Product")
-                                .font(.headline)
-                            Spacer()
-                            Text(sale.date?.formatted(date: .abbreviated, time: .shortened) ?? "")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                Section {
+                    ForEach(filteredSales) { sale in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(sale.product?.name ?? "Unknown Product")
+                                    .font(.headline)
+                                Spacer()
+                                Text(sale.date?.formatted(date: .abbreviated, time: .shortened) ?? "")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            HStack {
+                                Text("Quantity: \(sale.quantity)")
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text("$\(String(format: "%.2f", sale.totalPrice))")
+                                    .foregroundColor(.blue)
+                            }
                         }
-                        
-                        HStack {
-                            Text("Quantity: \(sale.quantity)")
-                                .foregroundColor(.secondary)
-                            Spacer()
-                            Text("$\(String(format: "%.2f", sale.totalPrice))")
-                                .foregroundColor(.blue)
-                        }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
             }
             .searchable(text: $searchText, prompt: "Search by product name")

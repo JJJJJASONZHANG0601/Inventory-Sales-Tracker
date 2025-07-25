@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="24.5.0" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24F74" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="Product" representedClassName="Product" syncable="YES" codeGenerationType="class">
-        <attribute name="name" attributeType="String"/>
-        <attribute name="quantity" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="purchasePrice" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="sellingPrice" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="lowStockThreshold" attributeType="Integer 32" defaultValueString="10" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="purchasePrice" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="quantity" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sellingPrice" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="purchaseOrders" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PurchaseOrder" inverseName="product" inverseEntity="PurchaseOrder"/>
         <relationship name="sales" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SaleRecord" inverseName="product" inverseEntity="SaleRecord"/>
+    </entity>
+    <entity name="PurchaseOrder" representedClassName="PurchaseOrder" syncable="YES" codeGenerationType="class">
+        <attribute name="purchaseDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="purchasePrice" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="quantity" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="purchaseOrders" inverseEntity="Product"/>
+        <relationship name="supplier" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Supplier" inverseName="purchaseOrders" inverseEntity="Supplier"/>
     </entity>
     <entity name="SaleRecord" representedClassName="SaleRecord" syncable="YES" codeGenerationType="class">
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
@@ -14,9 +22,16 @@
         <attribute name="totalPrice" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="sales" inverseEntity="Product"/>
     </entity>
+    <entity name="Supplier" representedClassName="Supplier" syncable="YES" codeGenerationType="class">
+        <attribute name="address" optional="YES" attributeType="String"/>
+        <attribute name="contactInfo" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <relationship name="purchaseOrders" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PurchaseOrder" inverseName="supplier" inverseEntity="PurchaseOrder"/>
+    </entity>
     <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
         <attribute name="password" attributeType="String"/>
         <attribute name="role" attributeType="String"/>
         <attribute name="username" attributeType="String"/>
     </entity>
-</model> 
+</model>

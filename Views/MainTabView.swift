@@ -32,10 +32,26 @@ struct MainTabView: View {
             }
             if role == "Manager" {
                 NavigationStack {
+                    SupplierListView()
+                }
+                .tabItem {
+                    Label("Suppliers", systemImage: "person.2")
+                }
+            }
+            if role == "Manager" {
+                NavigationStack {
                     ReportsView()
                 }
                 .tabItem {
                     Label("Reports", systemImage: "chart.bar")
+                }
+            }
+            if role == "Manager" {
+                NavigationStack {
+                    PurchaseOrderListView()
+                }
+                .tabItem {
+                    Label("Purchase Orders", systemImage: "doc.plaintext")
                 }
             }
             NavigationStack {

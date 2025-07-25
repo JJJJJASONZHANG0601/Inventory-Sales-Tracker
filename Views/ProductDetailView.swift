@@ -54,6 +54,29 @@ struct ProductDetailView: View {
                             .foregroundColor(.secondary)
                     }
                 }
+                Section(header: Text("Purchase History")) {
+                    if let purchaseOrders = product.purchaseOrders?.allObjects as? [PurchaseOrder], !purchaseOrders.isEmpty {
+                        ForEach(purchaseOrders.sorted { ($0.purchaseDate ?? Date.distantPast) > ($1.purchaseDate ?? Date.distantPast) }) { order in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(order.supplier?.name ?? "Unknown Supplier")
+                                    .font(.headline)
+                                HStack {
+                                    Text("Date: ")
+                                    Text(order.purchaseDate?.formatted(date: .abbreviated, time: .omitted) ?? "-")
+                                }
+                                HStack {
+                                    Text("Quantity: \(order.quantity)")
+                                    Spacer()
+                                    Text("Price: $\(String(format: "%.2f", order.purchasePrice))")
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    } else {
+                        Text("No purchase records")
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
         }
         .navigationTitle(isEditing ? "Edit Product" : "Product Details")

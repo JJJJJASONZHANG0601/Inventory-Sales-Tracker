@@ -1,34 +1,31 @@
-# Inventory & Sales Tracker for Small Restaurants
+# Small Restaurant Inventory & Sales Management App
 
----
+## Overview
 
-## Project Overview
-
-This project is a lightweight inventory and sales management app for small restaurants, supporting offline use, low-stock alerts, and sales analytics. It helps business owners efficiently manage daily inventory and sales data, with features like real-time stock tracking, sales recording, and visual reporting. The app includes multi-user role-based access control and CSV export functionality.
+This app is a lightweight inventory, sales, purchasing, and supplier management system designed for small restaurants. It supports offline use, low-stock alerts, multi-user roles, and detailed analytics. The app enables business owners to efficiently manage products, suppliers, purchase orders, sales, and users, with robust role-based access control and CSV export capabilities.
 
 ---
 
 ## Features
 
-### Core Functionality
-- **Product Management** (CRUD operations, low-stock red alerts)
-- **Sales Entry** (auto-decrement inventory, auto-calculate sales amount)
-- **Sales History** and trend analytics (charts)
-- **Local Notifications** for low-stock alerts
-- **Multi-tab Navigation** (Inventory, Sales, History, Reports, Settings)
+### Core Modules
 
-### Multi-User Role System
-- **Manager**: Full access to all features including user management and reports
-- **Staff**: Read-only access to inventory management only
-- **Cashier**: Access to sales recording and sales history only
+- **Product Management**: Add, edit, delete, and view products. Low-stock alerts and inventory tracking.
+- **Sales Management**: Record sales, auto-decrement inventory, and view sales history.
+- **Purchase Order Management**: Record and manage purchase orders, link to suppliers and products, and update inventory.
+- **Supplier Management**: Add, edit, delete, and view suppliers. View purchase history per supplier.
+- **Reports & Analytics**: Visualize sales trends and inventory status. Export detailed data as CSV.
+- **User Management**: Add, edit, and delete users (Manager only).
+- **Role-Based UI**: Dynamic tab visibility and feature access based on user role.
+- **Notifications**: Local notifications for low-stock products.
+- **Import/Export**: CSV export for products, sales, purchase orders, and suppliers.
+- **Sorting & Filtering**: Sort and search in all major lists.
 
-### Advanced Features
-- **User Management** (add, edit, delete users - Manager only)
-- **CSV Export** (sales and inventory reports - Manager only)
-- **Role-based UI** (dynamic tab visibility based on user role)
-- **Enhanced Error Handling** (friendly error messages with auto-dismiss)
-- **Dark Mode** and dynamic type support
-- **Offline Capability** (local Core Data storage)
+### User Roles
+
+- **Manager**: Full access to all features, including user, supplier, and purchase order management, and reports.
+- **Staff**: Read-only access to inventory.
+- **Cashier**: Access to sales entry and sales history.
 
 ---
 
@@ -43,14 +40,30 @@ This project is a lightweight inventory and sales management app for small resta
 
 ## Data Model
 
-### Core Entities
+### Entities
+
 - **Product**
   - name: String
   - quantity: Int32
   - purchasePrice: Double
   - sellingPrice: Double
   - lowStockThreshold: Int32
+  - purchaseOrders: [PurchaseOrder]
   - sales: [SaleRecord]
+
+- **Supplier**
+  - name: String
+  - contactInfo: String
+  - address: String
+  - notes: String
+  - purchaseOrders: [PurchaseOrder]
+
+- **PurchaseOrder**
+  - product: Product
+  - supplier: Supplier
+  - quantity: Int32
+  - purchasePrice: Double
+  - purchaseDate: Date
 
 - **SaleRecord**
   - date: Date
@@ -67,35 +80,36 @@ This project is a lightweight inventory and sales management app for small resta
 
 ## User Roles & Permissions
 
-| Feature / Role      | Manager | Staff | Cashier |
-|---------------------|:-------:|:-----:|:-------:|
-| Inventory Management|   ✔️    | Read-only |   ❌    |
-| Record Sales        |   ✔️    |   ❌   |   ✔️    |
-| Sales History       |   ✔️    |   ❌   |   ✔️    |
-| Reports/Analytics   |   ✔️    |   ❌   |   ❌    |
-| User Management     |   ✔️    |   ❌   |   ❌    |
-| Settings            |   ✔️    |   ✔️   |   ✔️    |
-
-**Legend:** ✔️ = Full access, Read-only = View only, ❌ = No access
+| Feature / Role      | Manager | Staff      | Cashier   |
+|---------------------|:-------:|:----------:|:---------:|
+| Inventory           |   ✔️    | Read-only  |     ❌    |
+| Sales Entry         |   ✔️    |     ❌     |    ✔️     |
+| Sales History       |   ✔️    |     ❌     |    ✔️     |
+| Purchase Orders     |   ✔️    |     ❌     |    ❌     |
+| Suppliers           |   ✔️    |     ❌     |    ❌     |
+| Reports/Analytics   |   ✔️    |     ❌     |    ❌     |
+| User Management     |   ✔️    |     ❌     |    ❌     |
+| Settings            |   ✔️    |    ✔️      |    ✔️     |
 
 ---
 
 ## Main Screens
 
-- **WelcomeView**: Multi-user login screen with role-based authentication
-- **MainTabView**: Dynamic navigation based on user role
-  - **InventoryView**: Product list & management (Manager/Staff)
+- **WelcomeView**: Login screen with role-based authentication.
+- **MainTabView**: Dynamic tab navigation based on user role.
+  - **InventoryView**: Product management (Manager/Staff)
   - **SalesView**: Sales entry (Manager/Cashier)
   - **SalesHistoryView**: Sales history (Manager/Cashier)
-  - **ReportsView**: Sales trends & inventory charts with CSV export (Manager only)
-  - **SettingsView**: Settings with user management (Manager only)
-- **UserManagementView**: User CRUD operations (Manager only)
+  - **PurchaseOrderListView**: Purchase order management (Manager)
+  - **SupplierListView**: Supplier management (Manager)
+  - **ReportsView**: Analytics and CSV export (Manager)
+  - **SettingsView**: App settings and user management (Manager)
+- **UserManagementView**: User CRUD (Manager only)
+- **ProductFormView**, **SupplierFormView**, **PurchaseOrderFormView**: Add/edit forms
 
 ---
 
 ## Default Users
-
-The app automatically creates three default users on first launch:
 
 | Username | Password   | Role    |
 |----------|------------|---------|
@@ -107,38 +121,11 @@ The app automatically creates three default users on first launch:
 
 ## How to Run
 
-1. Open `693_small_restaurant.xcodeproj` with Xcode 16+
-2. Select the main target `693_small_restaurant` and choose a Mac/iOS device or simulator
-3. Build & Run
-4. On first launch, enable local notification permissions in the Settings tab
-5. Login with any of the default users above
-
----
-
-## Key Features
-
-### Multi-User Authentication
-- Secure login with username/password validation
-- Role-based access control throughout the app
-- User management interface for administrators
-- Session management with automatic logout
-
-### Enhanced UI/UX
-- Friendly error messages with auto-dismiss
-- Form validation with real-time feedback
-- Loading states for async operations
-- Confirmation dialogs for destructive actions
-- Role-based UI elements (buttons, tabs, features)
-
-### Data Export
-- CSV export for sales trends and inventory status
-- Share functionality for reports
-- Manager-only access to export features
-
-### Notifications & Adaptation
-- Low-stock products automatically trigger local notifications (authorization required)
-- Supports dark mode and dynamic type
-- Compatible with macOS/iOS (some controls like keyboardType are iOS-only)
+1. Open `693_small_restaurant.xcodeproj` in Xcode 16+.
+2. Select the main target and a device/simulator.
+3. Build & Run.
+4. On first launch, enable notification permissions in Settings.
+5. Log in with any default user.
 
 ---
 
@@ -147,38 +134,43 @@ The app automatically creates three default users on first launch:
 ```
 693_small_restaurant/
 ├── Views/
-│   ├── WelcomeView.swift          # Login screen
-│   ├── MainTabView.swift          # Dynamic navigation
-│   ├── InventoryView.swift        # Product management
-│   ├── SalesView.swift           # Sales entry
-│   ├── SalesHistoryView.swift    # Sales history
-│   ├── ReportsView.swift         # Analytics & export
-│   ├── SettingsView.swift        # Settings & user management
-│   ├── UserManagementView.swift  # User CRUD operations
-│   └── ProductFormView.swift     # Product add/edit form
+│   ├── WelcomeView.swift
+│   ├── MainTabView.swift
+│   ├── InventoryView.swift
+│   ├── SalesView.swift
+│   ├── SalesHistoryView.swift
+│   ├── ReportsView.swift
+│   ├── SettingsView.swift
+│   ├── UserManagementView.swift
+│   ├── ProductFormView.swift
+│   ├── SupplierListView.swift
+│   ├── SupplierFormView.swift
+│   ├── SupplierDetailView.swift
+│   ├── PurchaseOrderListView.swift
+│   ├── PurchaseOrderFormView.swift
 ├── Managers/
-│   └── NotificationManager.swift  # Local notifications
-├── 693_small_restaurantApp.swift # App entry point
-└── 693_small_restaurant.xcdatamodeld/ # Core Data model
+│   └── NotificationManager.swift
+├── 693_small_restaurantApp.swift
+└── 693_small_restaurant.xcdatamodeld/
 ```
 
 ---
 
 ## Development Notes
 
-- **Core Data**: Local storage with automatic initial user creation
-- **SwiftUI**: Modern declarative UI with role-based conditional rendering
-- **Security**: Basic authentication with role-based permissions
-- **Export**: CSV generation with system share functionality
-- **Error Handling**: Comprehensive error messages and validation
+- **Core Data**: Local storage, automatic initial user creation.
+- **SwiftUI**: Modern declarative UI, role-based rendering.
+- **Security**: Basic authentication, role-based permissions.
+- **Export**: CSV generation and sharing.
+- **Error Handling**: Comprehensive validation and user feedback.
 
 ---
 
 ## Future Enhancements
 
 - PDF report export
-- Cloud synchronization
+- Cloud sync
 - Advanced analytics and forecasting
 - Barcode scanning for inventory
 - Multi-platform support (Android, Web)
-- API integration for external systems
+- API integration
